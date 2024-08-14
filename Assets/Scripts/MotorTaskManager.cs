@@ -68,7 +68,7 @@ public class MotorTaskManager : MonoBehaviour
         float startTime = Time.realtimeSinceStartup;
         float timeElapsed = 0; 
         //We need 300 seconds to complete the whole protocol
-        while (timeElapsed <= 300)
+        while (timeElapsed<=300)
         {
             yield return new WaitForSecondsRealtime(1f);
             timeElapsed = Time.realtimeSinceStartup - startTime;
@@ -85,7 +85,11 @@ public class MotorTaskManager : MonoBehaviour
                 //display green
                 yellow_light.color = Color.black; 
                 green_light.color = green;
-                events.Add(timeElapsed);
+                if (seconds <= 2)
+                {
+                    events.Add(timeElapsed);
+                    Debug.Log($"Event at time: {timeElapsed}");
+                }
 
             }else if(seconds > 4 && seconds <= 5)
             {
@@ -102,6 +106,7 @@ public class MotorTaskManager : MonoBehaviour
             {
                 //keep displaying red
                 numTrials++;
+                Debug.Log($"Num Trials: {numTrials}");
                 seconds = 0; 
             }
         }
@@ -112,13 +117,14 @@ public class MotorTaskManager : MonoBehaviour
     private void endTask()
     {
         StopAllCoroutines();
-        GameManager.instance.ChangeScene(GameManager.Scenes.Menu);
+        GameManager._instance.ChangeScene(GameManager.Scenes.Menu);
+        GameManager._instance.SaveEventsToCSV(events, 3f);
     }
 
     private void OnApplicationQuit()
     {
         Debug.Log(numTrials);
-        Debug.Log(events.ToArray());
+        GameManager._instance.SaveEventsToCSV(events, 3f);
         StopAllCoroutines();
     }
 }
