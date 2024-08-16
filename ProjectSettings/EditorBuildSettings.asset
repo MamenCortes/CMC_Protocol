@@ -12,6 +12,6 @@ EditorBuildSettings:
     path: Assets/Scenes/MotorTask.unity
     guid: 11abacccfd19fdb4692552fd9e64a5c1
   - enabled: 1
-    path: Assets/Scenes/Cognitive task.unity
+    path: Assets/Scenes/CognitiveTask.unity
     guid: 1762753475ed8b741b26e296eb63c981
   m_configObjects: {}

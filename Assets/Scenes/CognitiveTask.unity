@@ -453,7 +453,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   colorText: {fileID: 285948197}
   startButton: {fileID: 1807106710}
-  yellowProbability: 0.33
+  dualTask: 0
+  yellowProbability: 0.67
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0

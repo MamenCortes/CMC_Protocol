@@ -72,6 +72,18 @@ public class GameManager : Singleton<GameManager> //Static class
         FileManger.WriteToFile($"sub-01_motor-task_events_{trial}.csv", data);
         UpdateTrialNumber();
     }
+    public void SaveEventsToCSV(List<EventTime> events)
+    {
+        int trial = PlayerPrefs.GetInt(TrialNumberKey);
+        string data = "onset; duration; condition\n";
+        foreach (EventTime ev in events)
+        {
+            //To avoid float numbers be saved with ',' instead of '.' because of the Visual Studio Culture settings
+            data += ev.ToCSV(";");
+        }
+        FileManger.WriteToFile($"sub-01_motor-task_events_{trial}.csv", data);
+        UpdateTrialNumber();
+    }
 
     public void UpdateTrialNumber()
     {
