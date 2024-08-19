@@ -30,14 +30,24 @@ public class GameManager : Singleton<GameManager> //Static class
         if (scene_name == Scenes.Menu)
         {
             SceneManager.LoadScene(0);
-        }else if (scene_name == Scenes.MotorTask)
+        }
+        else if (scene_name == Scenes.Training)
         {
             SceneManager.LoadScene(1);
-        }else if (scene_name == Scenes.CognitiveTask)
+        }
+        else if (scene_name == Scenes.MotorTask)
         {
             SceneManager.LoadScene(2);
         }
+        else if (scene_name == Scenes.CognitiveTask)
+        {
+            SceneManager.LoadScene(3);
+        }
+        else if (scene_name == Scenes.MCTRelated)
+        {
+            SceneManager.LoadScene(4);
 
+        }
     }
     public void ChangeToMotorTask()
     {
@@ -47,6 +57,18 @@ public class GameManager : Singleton<GameManager> //Static class
     public void ChangeToCognitiveTask()
     {
         ChangeScene(Scenes.CognitiveTask);
+    }
+    public void ChangeToTrainingTask()
+    {
+        ChangeScene(Scenes.Training); 
+    }
+    public void ChangeToMCTRelated()
+    {
+        ChangeScene(Scenes.MCTRelated);
+    }
+    public void ChangeToMCTUnrelated()
+    {
+        ChangeScene(Scenes.MCTUnrelated); 
     }
 
     private void OnApplicationQuit()

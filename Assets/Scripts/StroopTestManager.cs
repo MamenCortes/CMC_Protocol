@@ -52,7 +52,7 @@ public class StroopTestManager : MonoBehaviour
 
         if (dualTask)
         {
-            colorNames = new List<String> { "HAND GRIP", "FLEX", "EXTEND", "GRASP" };
+            colorNames = new List<String> { "GRIP", "FLEX", "EXTEND", "GRASP" };
         }
         else
         {
