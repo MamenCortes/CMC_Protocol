@@ -10,6 +10,14 @@ public class GameManager : Singleton<GameManager> //Static class
     public enum Scenes { MotorTask, CognitiveTask, MCTRelated, MCTUnrelated, Training, Calibration, Menu };
     public static GameManager _instance;
     private string TrialNumberKey = "trialNumber";
+
+
+    //Participant's info
+    public string name;
+    public string surname;
+    public int subn; //subject number
+    public string sex;
+    public string filePath; 
     void Start()
     {
         DontDestroyOnLoad(this);

@@ -7,7 +7,16 @@ public static class FileManger
 {
     public static bool WriteToFile(string filename, string data)
     {
-        string fullPath = Path.Combine(Application.persistentDataPath, filename);
+        string fullPath; 
+        if (GameManager._instance.filePath == null || GameManager._instance.filePath == "")
+        {
+            fullPath = Path.Combine(Application.persistentDataPath, filename);
+        }
+        else
+        {
+            fullPath = Path.Combine(GameManager._instance.filePath, filename);
+        }
+    
 
         try
         {
