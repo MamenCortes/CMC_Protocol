@@ -12,11 +12,15 @@ public class TrainingManager : MonoBehaviour
     public TMP_Text instructionsText;
     public Button startButton;
     public Image circle;
+    public Button next;
+    public Button back; 
 
     private List<Color> colors; 
     private int maxTrials = 30;
     private float yellowProbability = 0.5f;
     private float interBlockSec = 30f; 
+
+    
     void Start()
     {
         //Button and gameObjects
@@ -24,8 +28,13 @@ public class TrainingManager : MonoBehaviour
         instructionsText.gameObject.SetActive(true);
         actionText.gameObject.SetActive(false);
         circle.gameObject.SetActive(false);
+        back.gameObject.SetActive(false);
+        next.gameObject.SetActive(false);
 
         startButton.onClick.AddListener(startTraining);
+        back.onClick.AddListener(BackToMenu);
+        next.onClick.AddListener(NextExperiment); 
+
         instructionsText.text = "Color training";
 
         colors = new List<Color> { Color.red, Color.green, Color.blue, Color.yellow };
@@ -118,6 +127,20 @@ public class TrainingManager : MonoBehaviour
     private void endTask()
     {
         StopAllCoroutines();
+        back.gameObject.SetActive(true) ;
+        next.gameObject.SetActive(true) ;
+
+    }
+
+    public void BackToMenu()
+    {
         GameManager._instance.ChangeScene(GameManager.Scenes.Menu);
     }
+
+    public void NextExperiment()
+    {
+        GameManager._instance.ChangeScene(GameManager.Scenes.MotorTask);
+    }
+
+
 }

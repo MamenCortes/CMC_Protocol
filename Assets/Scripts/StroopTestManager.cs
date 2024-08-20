@@ -5,11 +5,14 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
+using static System.Net.Mime.MediaTypeNames;
 public class StroopTestManager : MonoBehaviour
 {
     // Game elements
     public TMP_Text colorText;
-    public Button startButton; 
+    public Button startButton;
+    public Button next;
+    public Button back;
 
 
     //timer 
@@ -26,7 +29,7 @@ public class StroopTestManager : MonoBehaviour
     private List<Color> colors;
     private List<String> colorNames;
     private List<String> neutralNames;
-    public float yellowProbability = 0.67f; 
+    public float yellowProbability = 0.67f;
 
     private enum Conditions { Congruent, Incongruent, Neutral };
     // Access an enum by index: Conditions c = (Conditions)index;
@@ -40,6 +43,10 @@ public class StroopTestManager : MonoBehaviour
         startButton.gameObject.SetActive(true);
         colorText.gameObject.SetActive(false);
         startButton.onClick.AddListener(startTimer);
+        back.gameObject.SetActive(false);
+        next.gameObject.SetActive(false);
+        back.onClick.AddListener(BackToMenu);
+        next.onClick.AddListener(NextExperiment);
 
         //set parameters
         numTrials = 0;
@@ -52,7 +59,7 @@ public class StroopTestManager : MonoBehaviour
 
         if (dualTask)
         {
-            colorNames = new List<String> { "GRIP", "FLEX", "EXTEND", "GRASP" };
+            colorNames = new List<String> { "GRASP", "FLEX", "EXTEND", "ABDUCT" };
         }
         else
         {
@@ -174,16 +181,36 @@ public class StroopTestManager : MonoBehaviour
     private void endTask()
     {
         StopAllCoroutines();
-        GameManager._instance.ChangeScene(GameManager.Scenes.Menu);
-        GameManager._instance.SaveEventsToCSV(events, 3f);
+
+        if(dualTask) GameManager._instance.SaveEventsToCSV(eventTimes, "MCTRelated");
+        else GameManager._instance.SaveEventsToCSV(eventTimes, "cognitive");
+
+        next.gameObject.SetActive(true);
+        back.gameObject.SetActive(true);
     }
 
     private void OnApplicationQuit()
     {
-        Debug.Log($"Total number of trials{numTrials}");
-        //GameManager._instance.SaveEventsToCSV(events, 3f);
-        GameManager._instance.SaveEventsToCSV(eventTimes);
-        StopAllCoroutines();
+        endTask();
     }
 
+    public void BackToMenu()
+    {
+        GameManager._instance.ChangeScene(GameManager.Scenes.Menu);
+    }
+
+    public void NextExperiment()
+    {
+        if (dualTask)
+        {
+            //Finish protocol
+            GameManager._instance.ChangeScene(GameManager.Scenes.MCTUnrelated);
+        }
+        else
+        {
+            //Continue to Cognitive task 
+            GameManager._instance.ChangeScene(GameManager.Scenes.MCTRelated);
+        }
+
+    }
 }

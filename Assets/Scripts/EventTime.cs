@@ -38,14 +38,9 @@ public class EventTime
     {
         string formattedOnset = Onset.ToString(CultureInfo.InvariantCulture); 
         string formattedDuration = Duration.ToString(CultureInfo.InvariantCulture);
-        if (Condition == null)
-        {
-            return $"{formattedOnset}{delimiter}{formattedDuration}\n";
-        }
-        else
-        {
-            return $"{formattedOnset}{delimiter}{formattedDuration}{delimiter}{Condition}\n";
-        }
+
+        return $"{formattedOnset}{delimiter}{formattedDuration}{delimiter}{Condition}\n";
+        
     }
 
 }

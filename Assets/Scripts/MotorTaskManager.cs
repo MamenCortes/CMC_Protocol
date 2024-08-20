@@ -4,11 +4,9 @@ using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Net;
 
 public class MotorTaskManager : MonoBehaviour
-
-     //TODO: generar un patrón de luces
-     //TODO: generar timer y coordinar timer y las luces 
 
 {
     // Game elements
@@ -17,6 +15,9 @@ public class MotorTaskManager : MonoBehaviour
     private Image green_light;
     private Image yellow_light;
     public Button startButton;
+    public Button next;
+    public Button back; 
+
     //private Color red = new Color(228f, 69f, 69f, 255f);
     private Color red = Color.red; 
     private Color green = Color.green;
@@ -27,11 +28,15 @@ public class MotorTaskManager : MonoBehaviour
     //timer 
     //private float timeElapsed = 0;
     private List<float> events;
+    private List<EventTime> eventTimes; 
     private int numTrials; 
+
+    public bool dualTask; 
 
     void Start()
     {
         events = new List<float>();
+        eventTimes = new List<EventTime>();
         red_light = traffic_light.transform.GetChild(0).GetComponent<Image>();
         red_light.color = red;
         yellow_light = traffic_light.transform.GetChild(1).GetComponent<Image>();
@@ -43,15 +48,14 @@ public class MotorTaskManager : MonoBehaviour
         startButton.gameObject.SetActive(true);
         traffic_light.gameObject.SetActive(false);
         startButton.onClick.AddListener(startTimer);
+        back.gameObject.SetActive(false);
+        next.gameObject.SetActive(false);
+        back.onClick.AddListener(BackToMenu);
+        next.onClick.AddListener(NextExperiment);
 
         //set parameters
         numTrials = 0;
 
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
     }
 
     public void startTimer()
@@ -67,6 +71,7 @@ public class MotorTaskManager : MonoBehaviour
         int seconds = 0;
         float startTime = Time.realtimeSinceStartup;
         float timeElapsed = 0; 
+        yield return new WaitForSeconds(5f);
         //We need 300 seconds to complete the whole protocol
         while (timeElapsed<=300)
         {
@@ -88,6 +93,7 @@ public class MotorTaskManager : MonoBehaviour
                 if (seconds <= 2)
                 {
                     events.Add(timeElapsed);
+                    eventTimes.Add(new EventTime(timeElapsed, 3f, "")); 
                     Debug.Log($"Event at time: {timeElapsed}");
                 }
 
@@ -117,14 +123,44 @@ public class MotorTaskManager : MonoBehaviour
     private void endTask()
     {
         StopAllCoroutines();
-        GameManager._instance.ChangeScene(GameManager.Scenes.Menu);
-        GameManager._instance.SaveEventsToCSV(events, 3f);
+
+        if (dualTask) 
+        {
+            next.gameObject.SetActive(true);
+            GameManager._instance.SaveEventsToCSV(eventTimes, "MCTUnrelated");
+        }
+        else
+        {
+            next.gameObject.SetActive(true);
+            back.gameObject.SetActive(true);
+            GameManager._instance.SaveEventsToCSV(eventTimes, "motor");
+        } 
+        
+
     }
 
     private void OnApplicationQuit()
     {
-        Debug.Log(numTrials);
-        GameManager._instance.SaveEventsToCSV(events, 3f);
-        StopAllCoroutines();
+         endTask();
+    }
+
+    public void BackToMenu()
+    {
+        GameManager._instance.ChangeScene(GameManager.Scenes.Menu);
+    }
+
+    public void NextExperiment()
+    {
+        if (dualTask)
+        {
+            //Finish protocol
+            GameManager._instance.ChangeScene(GameManager.Scenes.Menu);
+        }
+        else
+        {
+            //Continue to Cognitive task 
+            GameManager._instance.ChangeScene(GameManager.Scenes.CognitiveTask);
+        }
+        
     }
 }

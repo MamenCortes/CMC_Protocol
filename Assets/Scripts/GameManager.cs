@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -9,28 +11,29 @@ public class GameManager : Singleton<GameManager> //Static class
     // Start is called before the first frame update
     public enum Scenes { MotorTask, CognitiveTask, MCTRelated, MCTUnrelated, Training, Calibration, Menu };
     public static GameManager _instance;
-    private string TrialNumberKey = "trialNumber";
+    private string participantsFolderPath = "C:/Users/mamen/git/CMC_Protocol";
+    private string participantsFileName = "CMC_subjects.csv"; 
 
 
     //Participant's info
-    public string name;
-    public string surname;
-    public int subn; //subject number
-    public string sex;
-    public string filePath; 
+    public string name = "";
+    public string surname = "";
+    public int subn = -1; //subject number
+    public int session = -1; 
+    public string sex = "";
+    public string filePath = "";
     void Start()
     {
         DontDestroyOnLoad(this);
         _instance = this;
-        //PlayerPrefs.SetInt(TrialNumberKey, 0);
-        Debug.Log($"Trial number: {PlayerPrefs.GetInt(TrialNumberKey)}");
 
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        //initialize variables
+        name = ""; 
+        surname = "";
+        subn = -1;
+        session = -1;
+        sex = ""; 
+        filePath = "";
     }
 
     public void ChangeScene(Scenes scene_name)
@@ -55,6 +58,9 @@ public class GameManager : Singleton<GameManager> //Static class
         {
             SceneManager.LoadScene(4);
 
+        }else if(scene_name == Scenes.MCTUnrelated)
+        {
+            SceneManager.LoadScene(5); 
         }
     }
     public void ChangeToMotorTask()
@@ -82,45 +88,29 @@ public class GameManager : Singleton<GameManager> //Static class
     private void OnApplicationQuit()
     {
         StopAllCoroutines();
-        //dbManager.SaveJSONToFile();
-        //dbManager.SaveXMLToFile();
-        //dbManager.closeConnection();
-        //Debug.Log("Connection Closed");
     }
 
-
-    public void SaveEventsToCSV(List<float> events, float duration)
+    /// <summary>
+    /// BIDS format for events 
+    ///  sub-<label>[_ses-<label>]_task-<label>[_acq-<label>][_run-<index>]_events.csv
+    /// </summary>
+    /// <param name="events"></param>
+    /// <param name="task"></param>
+    public void SaveEventsToCSV(List<EventTime> events, string task)
     {
-        int trial = PlayerPrefs.GetInt(TrialNumberKey);
-        string data = "onset; duration\n";
-        foreach (float onset in events)
-        {
-            //To avoid float numbers be saved with ',' instead of '.' because of the Visual Studio Culture settings
-            string formattedOnset = onset.ToString(CultureInfo.InvariantCulture);
-            data += formattedOnset+";"+duration+"\n";
-        }
-        FileManger.WriteToFile($"sub-01_motor-task_events_{trial}.csv", data);
-        UpdateTrialNumber();
-    }
-    public void SaveEventsToCSV(List<EventTime> events)
-    {
-        int trial = PlayerPrefs.GetInt(TrialNumberKey);
         string data = "onset; duration; condition\n";
         foreach (EventTime ev in events)
         {
-            //To avoid float numbers be saved with ',' instead of '.' because of the Visual Studio Culture settings
             data += ev.ToCSV(";");
         }
-        FileManger.WriteToFile($"sub-01_motor-task_events_{trial}.csv", data);
-        UpdateTrialNumber();
+        FileManager.WriteToFile($"sub-{subn}_ses-{session}_task-{task}_events.csv", data);
     }
 
-    public void UpdateTrialNumber()
+    public void saveSubject2File()
     {
-        int trialNumber  = PlayerPrefs.GetInt(TrialNumberKey);
-        trialNumber++;
-        PlayerPrefs.SetInt(TrialNumberKey, trialNumber);
-        PlayerPrefs.Save(); // Make sure to save the changes
+        //"Subject Nº,Session,Name,Surname,Sex,Events File Path ";
+        string sub = $"{subn};{session};{name};{surname};{sex};{filePath}";
+        Debug.Log(sub);
+        bool saved = FileManager.SaveSubjectToFile(participantsFolderPath, participantsFileName, sub); 
     }
-
 }

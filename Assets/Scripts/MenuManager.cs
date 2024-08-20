@@ -8,12 +8,17 @@ using System.IO;
 
 public class MenuManager : MonoBehaviour
 {
+
+    //TODO: add updateView with subjects info method
+
     [SerializeField]
     private TMP_InputField name;
     [SerializeField]
     private TMP_InputField surname;
     [SerializeField]
     private TMP_InputField sub;
+    [SerializeField]
+    private TMP_InputField session;
     [SerializeField]
     private TMP_InputField filePath;
     [SerializeField]
@@ -30,6 +35,8 @@ public class MenuManager : MonoBehaviour
         save.onClick.AddListener(saveSubjectInfo);
         openDirectory.onClick.AddListener(OpenDirectory); 
         error.gameObject.SetActive(false);
+
+        UpdateView(); 
     }
 
     public void saveSubjectInfo()
@@ -41,7 +48,9 @@ public class MenuManager : MonoBehaviour
         string filePathInput = filePath.text;
         string sexInput = sex.options[sex.value].text;
         string subnInput = sub.text;
+        string sessionInput = session.text;
         int subNum = -1;
+        int sessionNum; 
 
 
         Debug.Log($"Name: {nameInput}, Surname: {surnameInput}, sex: {sexInput}, filepath: {filePathInput}"); 
@@ -57,6 +66,14 @@ public class MenuManager : MonoBehaviour
         }
         else
         {
+            if(!int.TryParse(sessionInput, out sessionNum))
+            {
+                GameManager._instance.session = 1;
+            }
+            else
+            {
+                GameManager._instance.session = sessionNum;
+            }
             //If everything is correct, save them in the GameManager variables for later use
             GameManager._instance.name = nameInput;
             GameManager._instance.surname = surnameInput;
@@ -92,5 +109,32 @@ public class MenuManager : MonoBehaviour
 
     }
 
+    private void UpdateView()
+    {
+        if (GameManager._instance != null)
+        {
+            name.text = GameManager._instance.name;
+            surname.text = GameManager._instance.surname;
+            string sex = GameManager._instance.sex;
+            filePath.text = GameManager._instance.filePath;
+            sub.text = GameManager._instance.subn.ToString();
+            session.text = GameManager._instance.session.ToString();
+        }
+
+    }
+
+    public void startProtocol()
+    {
+        if(GameManager._instance.filePath == "" || GameManager._instance.subn == -1 || GameManager._instance.session == -1)
+        {
+            error.gameObject.SetActive(true);
+            error.text = "The folder path, subject number and session must be provided before starting the protocol";
+        }
+        else
+        {
+            GameManager._instance.saveSubject2File(); 
+            GameManager._instance.ChangeScene(GameManager.Scenes.Training);
+        }
+    }
 
 }
