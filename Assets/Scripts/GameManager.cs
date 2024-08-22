@@ -11,9 +11,9 @@ public class GameManager : Singleton<GameManager> //Static class
     // Start is called before the first frame update
     public enum Scenes { MotorTask, CognitiveTask, MCTRelated, MCTUnrelated, Training, Calibration, Menu };
     public static GameManager _instance;
-    private string participantsFolderPath = "C:/Users/mamen/git/CMC_Protocol";
-    private string participantsFileName = "CMC_subjects.csv"; 
-
+    public string participantsFolderPath;
+    private string participantsFileName = "CMC_subjects.csv";
+    private string folderPathKey = "participantsFolderPath"; 
 
     //Participant's info
     public string name = "";
@@ -34,6 +34,18 @@ public class GameManager : Singleton<GameManager> //Static class
         session = -1;
         sex = ""; 
         filePath = "";
+
+        participantsFolderPath = "C:/Users/mamen/git/CMC_Protocol";
+        if (PlayerPrefs.HasKey(folderPathKey))
+        {
+            participantsFolderPath = PlayerPrefs.GetString(folderPathKey);
+        }
+        else
+        {
+            participantsFolderPath = ""; 
+        }
+        
+
     }
 
     public void ChangeScene(Scenes scene_name)
@@ -112,5 +124,23 @@ public class GameManager : Singleton<GameManager> //Static class
         string sub = $"{subn};{session};{name};{surname};{sex};{filePath}";
         Debug.Log(sub);
         bool saved = FileManager.SaveSubjectToFile(participantsFolderPath, participantsFileName, sub); 
+    }
+
+    public bool CheckFolderPathNotEmpty()
+    {
+        if(participantsFolderPath == "")
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+
+    public void SetFolderPath(string path)
+    {
+        participantsFolderPath = path; 
+        PlayerPrefs.SetString(folderPathKey, path);
     }
 }

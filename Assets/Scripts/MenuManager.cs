@@ -29,14 +29,39 @@ public class MenuManager : MonoBehaviour
     private Button openDirectory;
     [SerializeField]
     private TMP_Dropdown sex;
+    [SerializeField]
+    private GameObject folderSelection;
+    [SerializeField]
+    private Button settingsButton;
+    private Button saveFolder;
+    private TMP_InputField folderPath;
+    private Button openFolder;
+    private TMP_Text error2; 
 
     void Start()
     {
         save.onClick.AddListener(saveSubjectInfo);
-        openDirectory.onClick.AddListener(OpenDirectory); 
-        error.gameObject.SetActive(false);
+        openDirectory.onClick.AddListener(() => OpenDirectory(filePath)); ; 
+
+        saveFolder = getChildGameObject(folderSelection, "save").GetComponent<Button>(); 
+        folderPath = folderSelection.GetComponentInChildren<TMP_InputField>();
+        openFolder = getChildGameObject(folderSelection, "openFolder").GetComponent<Button>();
+        error2 = getChildGameObject(folderSelection, "error").GetComponent<TMP_Text>();
+        error2.gameObject.SetActive(false);
+        saveFolder.onClick.AddListener(SaveFolderInfo);
+        openFolder.onClick.AddListener(() => OpenDirectory(folderPath));
+        settingsButton.onClick.AddListener(OpenFolderInfo); 
+        folderSelection.gameObject.SetActive(false);
 
         UpdateView(); 
+    }
+
+    static public GameObject getChildGameObject(GameObject fromGameObject, string withName)
+    {
+        //Author: Isaac Dart, June-13.
+        Transform[] ts = fromGameObject.transform.GetComponentsInChildren<Transform>();
+        foreach (Transform t in ts) if (t.gameObject.name == withName) return t.gameObject;
+        return null;
     }
 
     public void saveSubjectInfo()
@@ -102,15 +127,17 @@ public class MenuManager : MonoBehaviour
 
     }
 
-    public void OpenDirectory()
+    public void OpenDirectory(TMP_InputField inputfield)
     {
         string directory = EditorUtility.OpenFolderPanel("Select Directory", "", "");
-        filePath.text = directory;
+        //show directory chosen in this input field
+        inputfield.text = directory;
 
     }
 
     private void UpdateView()
     {
+        error.gameObject.SetActive (false);
         if (GameManager._instance != null)
         {
             name.text = GameManager._instance.name;
@@ -125,16 +152,74 @@ public class MenuManager : MonoBehaviour
 
     public void startProtocol()
     {
-        if(GameManager._instance.filePath == "" || GameManager._instance.subn == -1 || GameManager._instance.session == -1)
+        if (GameManager._instance.participantsFolderPath == "")
         {
             error.gameObject.SetActive(true);
-            error.text = "The folder path, subject number and session must be provided before starting the protocol";
+            error.text = "Select a folder's path to save the participant's info";
         }
         else
         {
-            GameManager._instance.saveSubject2File(); 
-            GameManager._instance.ChangeScene(GameManager.Scenes.Training);
+            if (GameManager._instance.filePath == "" || GameManager._instance.subn == -1 || GameManager._instance.session == -1)
+            {
+                error.gameObject.SetActive(true);
+                error.text = "The folder path, subject number and session must be provided before starting the protocol";
+            }
+            else
+            {
+                GameManager._instance.saveSubject2File();
+                GameManager._instance.ChangeScene(GameManager.Scenes.Training);
+            }
         }
     }
 
+    public void SaveFolderInfo()
+    {
+        error2.gameObject.SetActive(false);
+        string folderPathInput = folderPath.text;
+        GameManager._instance.participantsFolderPath = folderPath.text;
+        if (folderPathInput == "")
+        {
+            error2.gameObject.SetActive(true);
+            error2.text = "Select a path to save the participant's info";
+        }
+        else if (!Directory.Exists(folderPathInput))
+        {
+            error2.text = "Path doesn't exist";
+            //if it doesn't, create it Directory.CreateDirectory(directoryPath); }
+        }
+        else
+        {
+            //Save subject info
+            GameManager._instance.SetFolderPath(folderPathInput); 
+            //GameManager._instance.participantsFolderPath = folderPathInput;
+            folderSelection.gameObject.SetActive(false);
+        }
+    }
+
+    private void OpenFolderInfo()
+    {
+        if(folderSelection.gameObject.activeSelf== false)
+        {
+            folderSelection.gameObject.SetActive(true);
+            if (GameManager._instance.participantsFolderPath != null)
+            {
+                folderPath.text = GameManager._instance.participantsFolderPath;
+            }
+        }
+        else
+        {
+            folderSelection.gameObject.SetActive(false);
+        }
+        
+
+    }
+
+    private void checkFolderPathNotEmpty()
+    {
+        if (GameManager._instance.CheckFolderPathNotEmpty())
+        {
+            error.gameObject.SetActive(false);
+            error.text = "Select a path to save the participant's info!!";
+        }
+    }
 }
