@@ -16,7 +16,7 @@ public class TrainingManager : MonoBehaviour
     public Button back; 
 
     private List<Color> colors; 
-    private int maxTrials = 30;
+    private int maxTrials = 15;
     private float yellowProbability = 0.5f;
     private float interBlockSec = 30f; 
 

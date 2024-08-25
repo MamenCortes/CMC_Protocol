@@ -94,7 +94,7 @@ public class MotorTaskManager : MonoBehaviour
                 {
                     events.Add(timeElapsed);
                     eventTimes.Add(new EventTime(timeElapsed, 3f, "")); 
-                    Debug.Log($"Event at time: {timeElapsed}");
+                    //Debug.Log($"Event at time: {timeElapsed}");
                 }
 
             }else if(seconds > 4 && seconds <= 5)
@@ -116,7 +116,7 @@ public class MotorTaskManager : MonoBehaviour
                 seconds = 0; 
             }
         }
-
+        traffic_light.gameObject.SetActive( false );
         endTask();
     }
 
