@@ -1,2 +1,1 @@
-# CMC_Protocol
-GUI developed as a guidance and feedback of EEG-EMG protocol for CMC calculation
+<img src="ETH_Poster_Final_A0.png">
